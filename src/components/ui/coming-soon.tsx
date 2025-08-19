@@ -1,50 +1,47 @@
 'use client';
 
-import { useState } from 'react';
-import Header from '@/components/oxlas/Header';
-import Sidebar from '@/components/oxlas/Sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Kanban, Clock, Users, ArrowRight, ExternalLink } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
-export default function Projects() {
-  const features = [
-    {
-      icon: Kanban,
-      title: 'Kanban Boards',
-      description: 'Visual project management with drag-and-drop cards',
-      status: 'planned'
-    },
-    {
-      icon: Users,
-      title: 'Team Collaboration',
-      description: 'Real-time collaboration with team members',
-      status: 'planned'
-    },
-    {
-      icon: Clock,
-      title: 'Timeline View',
-      description: 'Gantt charts and project timelines',
-      status: 'planned'
-    }
-  ];
+interface ComingSoonProps {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  features: Array<{
+    title: string;
+    description: string;
+  }>;
+  integration?: {
+    name: string;
+    description: string;
+    features: string[];
+    benefits: string[];
+  };
+  color: string;
+}
 
+export function ComingSoon({ 
+  title, 
+  description, 
+  icon: Icon, 
+  features, 
+  integration,
+  color 
+}: ComingSoonProps) {
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
       <div className="flex-1 flex flex-col">
-        <Header />
-        
         <div className="flex-1 overflow-auto">
           <div className="p-6">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full mb-4">
-                <Kanban className="h-8 w-8 text-orange-600" />
+              <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${color} rounded-full mb-4`}>
+                <Icon className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">Projects</h1>
-              <p className="text-muted-foreground mb-4">Advanced project management with Planka integration</p>
+              <h1 className="text-3xl font-bold mb-2">{title}</h1>
+              <p className="text-muted-foreground mb-4">{description}</p>
               <Badge variant="outline" className="mb-6">
                 Coming Soon in Phase 2
               </Badge>
@@ -56,11 +53,11 @@ export default function Projects() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Kanban className="h-5 w-5 text-orange-600" />
-                    Project Management
+                    <Icon className="h-5 w-5" />
+                    {title}
                   </CardTitle>
                   <CardDescription>
-                    Powerful project management tools integrated with Planka for seamless workflow management
+                    Advanced {title.toLowerCase()} capabilities for enhanced productivity
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -68,7 +65,9 @@ export default function Projects() {
                     {features.map((feature, index) => (
                       <Card key={index} className="border-dashed">
                         <CardContent className="p-4 text-center">
-                          <feature.icon className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                          <div className="h-8 w-8 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
+                            <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
+                          </div>
                           <h3 className="font-medium mb-1">{feature.title}</h3>
                           <p className="text-sm text-muted-foreground">{feature.description}</p>
                           <Badge variant="secondary" className="mt-2 text-xs">
@@ -82,47 +81,45 @@ export default function Projects() {
               </Card>
 
               {/* Integration Info */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Planka Integration</CardTitle>
-                  <CardDescription>
-                    Seamless integration with Planka for professional project management
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Features</h4>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          <li>• Kanban-style boards</li>
-                          <li>• Task management</li>
-                          <li>• Team collaboration</li>
-                          <li>• Time tracking</li>
-                          <li>• File attachments</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Benefits</h4>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          <li>• Open-source</li>
-                          <li>• Self-hosted</li>
-                          <li>• Real-time updates</li>
-                          <li>• Mobile responsive</li>
-                          <li>• API access</li>
-                        </ul>
+              {integration && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{integration.name} Integration</CardTitle>
+                    <CardDescription>
+                      {integration.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="font-medium mb-2">Features</h4>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            {integration.features.map((feature, index) => (
+                              <li key={index}>• {feature}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">Benefits</h4>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            {integration.benefits.map((benefit, index) => (
+                              <li key={index}>• {benefit}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Status Timeline */}
               <Card>
                 <CardHeader>
                   <CardTitle>Development Timeline</CardTitle>
                   <CardDescription>
-                    Track the progress of Projects module development
+                    Track the progress of {title.toLowerCase()} module development
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -149,7 +146,7 @@ export default function Projects() {
                           <span className="font-medium">Integration Development</span>
                           <Badge variant="outline">In Progress</Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">Planka integration and API development</p>
+                        <p className="text-sm text-muted-foreground">Core integration and API development</p>
                       </div>
                     </div>
                     
@@ -174,15 +171,13 @@ export default function Projects() {
                 <CardContent className="p-8 text-center">
                   <h3 className="text-lg font-medium mb-2">Stay Updated</h3>
                   <p className="text-muted-foreground mb-4">
-                    Be the first to know when Projects module is released
+                    Be the first to know when {title.toLowerCase()} module is released
                   </p>
                   <div className="flex gap-2 justify-center">
                     <Button>
-                      <Users className="h-4 w-4 mr-2" />
                       Join Beta Program
                     </Button>
                     <Button variant="outline">
-                      <ExternalLink className="h-4 w-4 mr-2" />
                       View Documentation
                     </Button>
                   </div>

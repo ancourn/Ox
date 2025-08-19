@@ -1,13 +1,19 @@
+'use client';
+
+import Header from '@/components/oxlas/Header';
+import Sidebar from '@/components/oxlas/Sidebar';
+import Dashboard from '@/components/oxlas/Dashboard';
+
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-4">
-      <div className="relative w-24 h-24 md:w-32 md:h-32">
-        <img
-          src="/logo.svg"
-          alt="Z.ai Logo"
-          className="w-full h-full object-contain"
-        />
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-6">
+          <Dashboard />
+        </main>
       </div>
     </div>
-  )
+  );
 }

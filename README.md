@@ -1,141 +1,312 @@
-# 🚀 Welcome to Z.ai Code Scaffold
+# 🐂 Oxlas — Private. Branded. Powerful.
 
-A modern, production-ready web application scaffold powered by cutting-edge technologies, designed to accelerate your development with [Z.ai](https://chat.z.ai)'s AI-powered coding assistance.
+Oxlas is a fully open-source, self-hosted productivity suite that replaces Google Workspace with zero third-party branding.
 
-## ✨ Technology Stack
+## 🚀 Features
 
-This scaffold provides a robust foundation built with:
+- **Email** (`you@yourcompany.com`) - Private email with custom domains
+- **Calendar & Contacts** - Synchronized scheduling and address book
+- **Files & Drive** - Secure file storage and sharing
+- **Documents** - Collaborative editing with OnlyOffice
+- **Video Meetings** - Oxlas Meet with Jitsi integration
+- **AI Assistant** - Self-hosted Llama 3 for productivity
+- **Custom Domain Support** - Full DNS and SSL management
+- **Free + Paid Tiers** - Flexible pricing for all needs
 
-### 🎯 Core Framework
-- **⚡ Next.js 15** - The React framework for production with App Router
-- **📘 TypeScript 5** - Type-safe JavaScript for better developer experience
-- **🎨 Tailwind CSS 4** - Utility-first CSS framework for rapid UI development
+## 🛠️ Tech Stack
 
-### 🧩 UI Components & Styling
-- **🧩 shadcn/ui** - High-quality, accessible components built on Radix UI
-- **🎯 Lucide React** - Beautiful & consistent icon library
-- **🌈 Framer Motion** - Production-ready motion library for React
-- **🎨 Next Themes** - Perfect dark mode in 2 lines of code
+### Frontend
+- **Next.js 15** with App Router
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **shadcn/ui** components
+- **Zustand** for state management
+- **TanStack Query** for server state
 
-### 📋 Forms & Validation
-- **🎣 React Hook Form** - Performant forms with easy validation
-- **✅ Zod** - TypeScript-first schema validation
+### Backend
+- **Node.js** API Gateway
+- **PostgreSQL** database
+- **Redis** caching
+- **Prisma** ORM
+- **Socket.io** for real-time features
 
-### 🔄 State Management & Data Fetching
-- **🐻 Zustand** - Simple, scalable state management
-- **🔄 TanStack Query** - Powerful data synchronization for React
-- **🌐 Axios** - Promise-based HTTP client
+### Core Services
+- **Email**: Postfix + Dovecot + Rspamd
+- **Files**: Nextcloud (headless)
+- **Docs**: OnlyOffice (white-labeled)
+- **Video**: Jitsi (custom interface)
+- **AI**: Ollama + Llama 3
 
-### 🗄️ Database & Backend
-- **🗄️ Prisma** - Next-generation Node.js and TypeScript ORM
-- **🔐 NextAuth.js** - Complete open-source authentication solution
+### Infrastructure
+- **Docker** containerization
+- **Nginx** reverse proxy
+- **SSL/TLS** encryption
+- **Health monitoring**
 
-### 🎨 Advanced UI Features
-- **📊 TanStack Table** - Headless UI for building tables and datagrids
-- **🖱️ DND Kit** - Modern drag and drop toolkit for React
-- **📊 Recharts** - Redefined chart library built with React and D3
-- **🖼️ Sharp** - High performance image processing
+## 📦 Quick Start
 
-### 🌍 Internationalization & Utilities
-- **🌍 Next Intl** - Internationalization library for Next.js
-- **📅 Date-fns** - Modern JavaScript date utility library
-- **🪝 ReactUse** - Collection of essential React hooks for modern development
+### Prerequisites
+- Docker and Docker Compose
+- Node.js 18+ (for development)
+- Domain name (for production)
 
-## 🎯 Why This Scaffold?
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-org/oxlas.git
+cd oxlas
+```
 
-- **🏎️ Fast Development** - Pre-configured tooling and best practices
-- **🎨 Beautiful UI** - Complete shadcn/ui component library with advanced interactions
-- **🔒 Type Safety** - Full TypeScript configuration with Zod validation
-- **📱 Responsive** - Mobile-first design principles with smooth animations
-- **🗄️ Database Ready** - Prisma ORM configured for rapid backend development
-- **🔐 Auth Included** - NextAuth.js for secure authentication flows
-- **📊 Data Visualization** - Charts, tables, and drag-and-drop functionality
-- **🌍 i18n Ready** - Multi-language support with Next Intl
-- **🚀 Production Ready** - Optimized build and deployment settings
-- **🤖 AI-Friendly** - Structured codebase perfect for AI assistance
+### 2. Environment Configuration
+Create a `.env` file:
+```env
+# Database
+POSTGRES_PASSWORD=yourstrongpassword
 
-## 🚀 Quick Start
+# Email Services
+POSTFIX_PASSWORD=youremailpassword
 
+# Video Conferencing
+JITSI_PASSWORD=yourjitsipassword
+
+# Frontend
+FRONTEND_URL=http://localhost:3000
+NEXTAUTH_SECRET=yournextauthsecret
+NEXTAUTH_URL=http://localhost:3000
+
+# AI Services
+AI_SERVICE_URL=http://ollama:11434
+```
+
+### 3. Start the Services
+```bash
+# Development mode
+npm run dev
+
+# Production mode
+docker-compose up -d
+```
+
+### 4. Access Oxlas
+- Frontend: `http://localhost:3000`
+- API Gateway: `http://localhost:3001`
+- Health Check: `http://localhost/health`
+
+## 🏗️ Project Structure
+
+```
+oxlas/
+├── docker-compose.yml           # Core services orchestration
+├── nginx.conf                   # Reverse proxy configuration
+├── package.json                 # Main project dependencies
+├── README.md                    # This file
+├── LICENSE                      # MIT license
+├── NOTICE                       # Open-source attributions
+├── PRIVACY_POLICY.md            # Privacy policy
+├── TOS.md                       # Terms of service
+│
+├── src/                         # Next.js application
+│   ├── app/                     # App Router pages
+│   ├── components/              # React components
+│   ├── lib/                     # Utilities and configurations
+│   └── hooks/                   # Custom React hooks
+│
+├── api-gateway/                 # Node.js API Gateway
+│   ├── src/
+│   │   ├── server.ts           # Main server file
+│   │   ├── middleware/         # Authentication & validation
+│   │   ├── routes/             # API endpoints
+│   │   └── services/           # Business logic
+│   └── package.json
+│
+├── config/                      # Service configurations
+│   ├── jitsi-custom/           # Jitsi branding
+│   ├── onlyoffice/             # OnlyOffice CSS
+│   └── dovecot/                # Email server config
+│
+└── docs/                        # Documentation
+    ├── deployment-guide.md
+    ├── api-reference.md
+    └── customization-guide.md
+```
+
+## 🎨 Branding & Customization
+
+### Logo and Colors
+- Replace `public/logo.svg` with your brand logo
+- Customize colors in `tailwind.config.ts`
+- Update brand name in configuration files
+
+### Domain Setup
+1. Point your domain to the server IP
+2. Configure SSL certificates
+3. Update environment variables
+4. Restart services
+
+### White-Labeling
+- All third-party logos are removed
+- Custom CSS for integrated services
+- Branded email templates
+- Custom domain email addresses
+
+## 🔧 Development
+
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run db:push      # Push database schema
+npm run db:generate  # Generate Prisma client
+```
+
+### Database Management
+```bash
+# View database
+npm run db:studio
+
+# Reset database
+npm run db:reset
+
+# Create migration
+npm run db:migrate
+```
+
+## 📊 Monitoring
+
+### Health Checks
+- Frontend: `GET /health`
+- API Gateway: `GET /api/health`
+- Database: Automatic connection checks
+- Services: Container health monitoring
+
+### Logging
+- Application logs: `logs/app.log`
+- API logs: `logs/api.log`
+- System logs: `logs/system.log`
+- Error tracking: Built-in error reporting
+
+## 🛡️ Security
+
+### Features
+- End-to-end encryption
+- JWT authentication
+- Rate limiting
+- Input validation
+- CORS protection
+- Security headers
+- Regular security updates
+
+### Best Practices
+- Strong password requirements
+- Two-factor authentication
+- Session management
+- Data encryption at rest
+- Regular backups
+- Security audits
+
+## 📄 Compliance
+
+### Regulations
+- **GDPR** - General Data Protection Regulation
+- **CCPA** - California Consumer Privacy Act
+- **HIPAA** - Health Insurance Portability (optional)
+- **SOC 2** - Service Organization Control (optional)
+
+### Data Handling
+- Data minimization
+- User consent management
+- Data portability
+- Right to be forgotten
+- Breach notification
+
+## 🌐 Deployment
+
+### Local Development
 ```bash
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
+```
 
-# Build for production
+### Production Deployment
+```bash
+# Build the application
 npm run build
 
-# Start production server
+# Start with Docker
+docker-compose up -d
+
+# Or start directly
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your application running.
+### Cloud Deployment
+- **AWS**: EC2 + RDS + S3
+- **Google Cloud**: Compute Engine + Cloud SQL
+- **Azure**: Virtual Machines + Database
+- **DigitalOcean**: Droplets + Managed Databases
 
-## 🤖 Powered by Z.ai
+## 🤝 Contributing
 
-This scaffold is optimized for use with [Z.ai](https://chat.z.ai) - your AI assistant for:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-- **💻 Code Generation** - Generate components, pages, and features instantly
-- **🎨 UI Development** - Create beautiful interfaces with AI assistance  
-- **🔧 Bug Fixing** - Identify and resolve issues with intelligent suggestions
-- **📝 Documentation** - Auto-generate comprehensive documentation
-- **🚀 Optimization** - Performance improvements and best practices
+### Development Guidelines
+- Follow TypeScript best practices
+- Use ESLint configuration
+- Write meaningful commit messages
+- Update documentation
+- Test thoroughly
 
-Ready to build something amazing? Start chatting with Z.ai at [chat.z.ai](https://chat.z.ai) and experience the future of AI-powered development!
+## 📞 Support
 
-## 📁 Project Structure
+### Documentation
+- [API Reference](./docs/api-reference.md)
+- [Deployment Guide](./docs/deployment-guide.md)
+- [Customization Guide](./docs/customization-guide.md)
 
-```
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable React components
-│   └── ui/             # shadcn/ui components
-├── hooks/              # Custom React hooks
-└── lib/                # Utility functions and configurations
-```
+### Community
+- GitHub Issues
+- Discord Community
+- Email Support
+- Premium Support (paid plans)
 
-## 🎨 Available Features & Components
+## 📄 Legal
 
-This scaffold includes a comprehensive set of modern web development tools:
+- [License](./LICENSE) - MIT License
+- [Privacy Policy](./PRIVACY_POLICY.md)
+- [Terms of Service](./TOS.md)
+- [NOTICE](./NOTICE) - Open-source attributions
 
-### 🧩 UI Components (shadcn/ui)
-- **Layout**: Card, Separator, Aspect Ratio, Resizable Panels
-- **Forms**: Input, Textarea, Select, Checkbox, Radio Group, Switch
-- **Feedback**: Alert, Toast (Sonner), Progress, Skeleton
-- **Navigation**: Breadcrumb, Menubar, Navigation Menu, Pagination
-- **Overlay**: Dialog, Sheet, Popover, Tooltip, Hover Card
-- **Data Display**: Badge, Avatar, Calendar
+## 🚀 Roadmap
 
-### 📊 Advanced Data Features
-- **Tables**: Powerful data tables with sorting, filtering, pagination (TanStack Table)
-- **Charts**: Beautiful visualizations with Recharts
-- **Forms**: Type-safe forms with React Hook Form + Zod validation
+### Phase 1 (Current)
+- ✅ Core infrastructure
+- ✅ Basic UI components
+- ✅ API Gateway
+- ✅ Email integration
+- ✅ File storage
 
-### 🎨 Interactive Features
-- **Animations**: Smooth micro-interactions with Framer Motion
-- **Drag & Drop**: Modern drag-and-drop functionality with DND Kit
-- **Theme Switching**: Built-in dark/light mode support
+### Phase 2 (Q1 2025)
+- 🔄 Advanced AI features
+- 🔄 Mobile applications
+- 🔄 Advanced analytics
+- 🔄 Team management
 
-### 🔐 Backend Integration
-- **Authentication**: Ready-to-use auth flows with NextAuth.js
-- **Database**: Type-safe database operations with Prisma
-- **API Client**: HTTP requests with Axios + TanStack Query
-- **State Management**: Simple and scalable with Zustand
-
-### 🌍 Production Features
-- **Internationalization**: Multi-language support with Next Intl
-- **Image Optimization**: Automatic image processing with Sharp
-- **Type Safety**: End-to-end TypeScript with Zod validation
-- **Essential Hooks**: 100+ useful React hooks with ReactUse for common patterns
-
-## 🤝 Get Started with Z.ai
-
-1. **Clone this scaffold** to jumpstart your project
-2. **Visit [chat.z.ai](https://chat.z.ai)** to access your AI coding assistant
-3. **Start building** with intelligent code generation and assistance
-4. **Deploy with confidence** using the production-ready setup
+### Phase 3 (Q2 2025)
+- 📅 Enterprise features
+- 📅 Advanced integrations
+- 📅 Marketplace
+- 📅 API platform
 
 ---
 
-Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀
+**Oxlas Technologies Inc.** © 2025
+
+Built with ❤️ for privacy and productivity.

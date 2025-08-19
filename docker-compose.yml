@@ -1,0 +1,318 @@
+version: '3.8'
+
+services:
+  # Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api-gateway
+    networks:
+      - oxlas-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - oxlas-network
+
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: oxlas
+      POSTGRES_USER: oxlas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - oxlas-network
+
+  # Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - oxlas-network
+
+  # Email Services
+  postfix:
+    image: catatnight/postfix
+    environment:
+      - maildomain=oxlas.com
+      - smtp_user=oxlas:${POSTFIX_PASSWORD}
+    ports:
+      - "25:25"
+      - "587:587"
+    networks:
+      - oxlas-network
+
+  dovecot:
+    image: dovecot/dovecot:latest
+    ports:
+      - "143:143"
+      - "993:993"
+    volumes:
+      - ./config/dovecot:/etc/dovecot
+    networks:
+      - oxlas-network
+
+  # File Storage
+  nextcloud:
+    image: nextcloud:latest
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=oxlas
+      - POSTGRES_USER=oxlas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=redis
+    ports:
+      - "8080:80"
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - oxlas-network
+
+  # Document Editing
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    ports:
+      - "8002:80"
+    networks:
+      - oxlas-network
+    restart: unless-stopped
+
+  # Video Conferencing
+  jitsi:
+    image: jitsi/web:latest
+    environment:
+      - JICOFO_AUTH_PASSWORD=${JITSI_PASSWORD}
+      - JVB_AUTH_PASSWORD=${JITSI_PASSWORD}
+    ports:
+      - "8082:80"
+      - "4443:443"
+    networks:
+      - oxlas-network
+
+  # AI Services
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    command: sh -c "ollama pull llama3 && ollama serve"
+    networks:
+      - oxlas-network
+
+  # Project Management (Planka)
+  planka:
+    image: planka/planka:latest
+    ports:
+      - "10240:10240"
+    environment:
+      - APP_PORT=10240
+      - DB_CLIENT=pg
+      - DATABASE_URL=postgresql://oxlas:${POSTGRES_PASSWORD}@postgres:5432/oxlas_planka
+      - APP_CRYPTO_KEY=${PLANKA_CRYPTO_KEY}
+      - APP_JWT_SECRET=${PLANKA_JWT_SECRET}
+    networks:
+      - oxlas-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # Customer Support (Zammad)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - oxlas-network
+
+  zammad:
+    image: zammad/zammad:latest
+    ports:
+      - "20240:20240"
+    environment:
+      - ZAMMAD_RAILSSERVER_HOST=0.0.0.0
+      - ZAMMAD_RAILSSERVER_PORT=20240
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=oxlas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=oxlas_zammad
+      - ELASTICSEARCH_HOST=elasticsearch
+      - REDIS_HOST=redis
+    volumes:
+      - zammad_data:/opt/zammad
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+    networks:
+      - oxlas-network
+
+  # Wiki/Documentation (Outline)
+  outline:
+    image: outlinewiki/outline:latest
+    ports:
+      - "3002:3000"
+    environment:
+      - DATABASE_URL=postgresql://oxlas:${POSTGRES_PASSWORD}@postgres:5432/oxlas_outline
+      - REDIS_URL=redis://redis:6379
+      - URL=http://localhost:3002
+      - PORT=3000
+      - SECRET_KEY=${OUTLINE_SECRET_KEY}
+      - UTILS_SECRET=${OUTLINE_UTILS_SECRET}
+    networks:
+      - oxlas-network
+    depends_on:
+      - postgres
+      - redis
+
+  # Chat (Matrix + Element)
+  matrix-synapse:
+    image: matrixdotorg/synapse:latest
+    ports:
+      - "8008:8008"
+    environment:
+      - SYNAPSE_SERVER_NAME=oxlas.com
+      - SYNAPSE_REPORT_STATS=yes
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=oxlas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=oxlas_matrix
+    volumes:
+      - matrix_data:/data
+    depends_on:
+      - postgres
+    networks:
+      - oxlas-network
+
+  element-web:
+    image: vectorim/element-web:latest
+    ports:
+      - "8083:80"
+    environment:
+      - ELEMENT_WEB_SETTINGS={"default_server_config":{"m.homeserver":{"server_name":"oxlas.com","server_url":"http://matrix-synapse:8008"}}}
+    networks:
+      - oxlas-network
+    depends_on:
+      - matrix-synapse
+
+  # Forms (Formbricks)
+  formbricks:
+    image: ghcr.io/formbricks/formbricks:latest
+    ports:
+      - "3003:3000"
+    environment:
+      - DATABASE_URL=postgresql://oxlas:${POSTGRES_PASSWORD}@postgres:5432/oxlas_formbricks
+      - NEXTAUTH_URL=http://localhost:3003
+      - NEXTAUTH_SECRET=${FORMBRICKS_SECRET}
+      - ENCRYPTION_KEY=${FORMBRICKS_ENCRYPTION_KEY}
+    networks:
+      - oxlas-network
+    depends_on:
+      - postgres
+
+  # Notes (Joplin Server)
+  joplin:
+    image: joplin/server:latest
+    ports:
+      - "22300:22300"
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=http://localhost:22300
+      - DB_CLIENT=pg
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=oxlas_joplin
+      - POSTGRES_USER=oxlas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - joplin_data:/config
+    depends_on:
+      - postgres
+    networks:
+      - oxlas-network
+
+  # Search (Meilisearch)
+  meilisearch:
+    image: getmeili/meilisearch:v1
+    command: meilisearch --master-key=${MEILISEARCH_MASTER_KEY}
+    environment:
+      - MEILI_MASTER_KEY=${MEILISEARCH_MASTER_KEY}
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - oxlas-network
+
+  # Object Storage (MinIO)
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - oxlas-network
+
+  # Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - api-gateway
+    networks:
+      - oxlas-network
+
+volumes:
+  postgres_data:
+  nextcloud_data:
+  ollama_data:
+  elasticsearch_data:
+  zammad_data:
+  matrix_data:
+  joplin_data:
+  meilisearch_data:
+  minio_data:
+
+networks:
+  oxlas-network:
+    driver: bridge

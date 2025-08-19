@@ -5,24 +5,33 @@ import { useState } from 'react';
 export default function AIAssistant() {
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setResponse('');
+    setError('');
 
     try {
       const res = await fetch('/api/ai/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
+        headers: { 'Content-Type': 'application/json' },
       });
-
+      
+      if (!res.ok) throw new Error('Network error');
+      
       const data = await res.json();
-      setResponse(data.response || data.error);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setResponse(data.response);
+      }
     } catch (err) {
-      setResponse('Failed to reach AI engine. Is Ollama running?');
+      setError('❌ Failed to reach AI engine. Is Ollama running? Check console.');
+      console.error(err);
     }
 
     setLoading(false);
@@ -50,9 +59,16 @@ export default function AIAssistant() {
         </button>
       </form>
 
+      {error && (
+        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <h2 className="font-semibold mb-2">Error:</h2>
+          <p>{error}</p>
+        </div>
+      )}
+
       {response && (
         <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg whitespace-pre-wrap">
-          <h2 className="font-semibold mb-2">Response:</h2>
+          <h2 className="font-semibold mb-2">AI Response:</h2>
           <p>{response}</p>
         </div>
       )}

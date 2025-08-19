@@ -69,6 +69,8 @@ const navigation = [
     icon: FileEdit,
     color: 'text-teal-600',
   },
+  // Temporarily disabled modules - Phase 2
+  /*
   {
     name: 'Projects',
     href: '/projects',
@@ -104,6 +106,59 @@ const navigation = [
     href: '/notes',
     icon: StickyNote,
     color: 'text-green-700',
+  },
+  */
+];
+
+// Coming soon modules for Phase 2
+const comingSoonNavigation = [
+  {
+    name: 'Projects',
+    href: '#',
+    icon: Kanban,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'Care',
+    href: '#',
+    icon: Headset,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'Wiki',
+    href: '#',
+    icon: Book,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'Chat',
+    href: '#',
+    icon: MessageSquare,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'Forms',
+    href: '#',
+    icon: Clipboard,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'Notes',
+    href: '#',
+    icon: StickyNote,
+    color: 'text-gray-400',
+    disabled: true,
+    badge: 'Coming Soon'
   },
 ];
 
@@ -245,6 +300,34 @@ export default function Sidebar({ className }: SidebarProps) {
             );
           })}
         </div>
+
+        {/* Coming Soon Navigation */}
+        {!isCollapsed && (
+          <div className="pt-4 mt-4 border-t">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground mb-2">COMING SOON</p>
+              {comingSoonNavigation.map((item) => (
+                <div
+                  key={item.name}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-not-allowed',
+                    'text-muted-foreground opacity-60'
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    return false;
+                  }}
+                >
+                  <item.icon className={cn('h-5 w-5', item.color)} />
+                  <span className="flex-1">{item.name}</span>
+                  <Badge variant="outline" className="text-xs">
+                    {item.badge}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Secondary Navigation */}
         {!isCollapsed && (
